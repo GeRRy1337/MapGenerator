@@ -1,5 +1,4 @@
 package tileset;
-
 import static tileset.TileType.*;
 
 public enum Tiles {
@@ -12,11 +11,10 @@ public enum Tiles {
     SOUTH_EAST_GRASS_WATER(WATER_TYPE, WATER_GRASS_TYPE, WATER_GRASS_TYPE, WATER_TYPE),
     SOUTH_GRASS_WATER(WATER_TYPE, WATER_GRASS_TYPE, GRASS_TYPE, WATER_GRASS_TYPE),
     SOUTH_WEST_GRASS_WATER(WATER_TYPE, WATER_TYPE, GRASS_WATER_TYPE, WATER_GRASS_TYPE),
-    WEST_GRASS_WATER(GRASS_WATER_TYPE, WATER_TYPE, GRASS_WATER_TYPE, GRASS_TYPE),
-    ;
+    WEST_GRASS_WATER(GRASS_WATER_TYPE, WATER_TYPE, GRASS_WATER_TYPE, GRASS_TYPE);
     
     public final TileType top, right, bottom, left;
-
+    
     private Tiles(TileType top, TileType right, TileType bottom, TileType left) {
         this.top = top;
         this.right = right;

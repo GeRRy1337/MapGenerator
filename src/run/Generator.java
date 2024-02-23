@@ -3,13 +3,14 @@ package run;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import tileset.Tile;
 import tileset.TileType;
 import tileset.Tiles;
 import static tileset.Tiles.GRASS;
 
 public class Generator {
 
-    static Tiles[][] tileMatrix = new Tiles[50][50];
+    static Tile[][] tileMatrix = new Tile[50][50];
     static int entropy[][] = new int[50][50];
 
     public static void main(String[] args) {
@@ -18,15 +19,20 @@ public class Generator {
                 entropy[i][j] = 10;
             }
         }
+        for (int i = 0; i < 50; i++) {
+            for (int j = 0; j < 50; j++) {
+                tileMatrix[i][j] = new Tile();
+            }
+        }
         entropy[24][24] = 0;
-        tileMatrix[24][24] = GRASS;
+        tileMatrix[24][24].tile = GRASS;
         updateEntropy(24, 24);
         printEntropy();
     }
 
     public static void printMatrix() {
-        for (Tiles[] row : tileMatrix) {
-            for (Tiles tile : row) {
+        for (Tile[] row : tileMatrix) {
+            for (Tile tile : row) {
                 System.out.print(tile.toString() + " ");
             }
             System.out.println("");
@@ -84,90 +90,23 @@ public class Generator {
 
     }
     
+    /**
+     * 
+     * @param i x coordinate of the tile
+     * @param j y coordinate of the tile
+     * @return an ArrayList<Tiles> of the possible tiles for the coordinates
+     */
     public static ArrayList<Tiles> getGoodTiles(int i, int j){
-        if(!inBounds(i,j) || tileMatrix[j][i] != null){return new ArrayList();}
-        //check top
-        int x = i;
-        int y = j-1;
-        ArrayList<Tiles> topTiles = new ArrayList();
-        if(inBounds(x,y)){
-            if (entropy[y][x] == 10){
-                topTiles = new ArrayList<>(List.of(Tiles.values()));
-            }else if(entropy[y][x] == 0){
-                topTiles = new ArrayList<>();
-                topTiles.add(tileMatrix[y][x]);
-            }else{
-                topTiles = getGoodTiles(x, y);
-            }
-        }
         
-        //bottom
-        x = i;
-        y = j+1;
-        ArrayList<Tiles> bottomTiles = new ArrayList();
-        if(inBounds(x,y)){
-            if (entropy[y][x] == 10){
-                bottomTiles = new ArrayList<>(List.of(Tiles.values()));
-            }else if(entropy[y][x] == 0){
-                bottomTiles = new ArrayList<>();
-                bottomTiles.add(tileMatrix[y][x]);
-            }else{
-                bottomTiles = getGoodTiles(x, y);
-            }
-        }
+        ArrayList<Tiles> topTiles = new ArrayList<>(); 
+        ArrayList<Tiles> bottomTiles = new ArrayList<>();
+        ArrayList<Tiles> leftTiles = new ArrayList<>(); 
+        ArrayList<Tiles> rightTiles = new ArrayList<>(); 
         
-        //left
-        x = i-1;
-        y = j;
-        ArrayList<Tiles> leftTiles = new ArrayList();
-        if(inBounds(x,y)){
-            if (entropy[y][x] == 10){
-                leftTiles = new ArrayList<>(List.of(Tiles.values()));
-            }else if(entropy[y][x] == 0){
-                leftTiles = new ArrayList<>();
-                leftTiles.add(tileMatrix[y][x]);
-            }else{
-                leftTiles = getGoodTiles(x, y);
-            }
-        }
         
-        //right
-        x = i+1;
-        y = j;
-        ArrayList<Tiles> rightTiles = new ArrayList();
-        if(inBounds(x,y)){
-            if (entropy[y][x] == 10){
-                rightTiles = new ArrayList<>(List.of(Tiles.values()));
-            }else if(entropy[y][x] == 0){
-                rightTiles = new ArrayList<>();
-                rightTiles.add(tileMatrix[y][x]);
-            }else{
-                rightTiles = getGoodTiles(x, y);
-            }
-        }
-        
-        HashSet<Tiles> goodTiles = new HashSet();
-        
-        for(Tiles tile : topTiles){
-            if(tile != null)
-                goodTiles.addAll(searchConnecting("top", tile.bottom));
-        }
-        for(Tiles tile : bottomTiles){
-            if(tile != null)
-                goodTiles.retainAll(searchConnecting("bottom", tile.top));
-        }
-        for(Tiles tile : leftTiles){
-            if(tile != null)
-                goodTiles.retainAll(searchConnecting("left", tile.right));
-        }
-        for(Tiles tile : rightTiles){
-            if(tile != null)
-                goodTiles.retainAll(searchConnecting("right", tile.left));
-        }
-        
-        return new ArrayList<>(goodTiles.stream().toList());
+        return new ArrayList<>();
     }
-
+    
     public static ArrayList<Tiles> searchConnecting(String side, TileType tt) {
         return new ArrayList<> (List.of(Tiles.values()).stream().filter(tile -> tile.getSide(side).equals(tt)).toList());
     }
