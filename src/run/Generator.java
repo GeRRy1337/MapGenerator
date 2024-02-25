@@ -97,7 +97,7 @@ public class Generator {
 
     private static ArrayList<int[]> getLowestEntropies(){
         ArrayList<int[]> list = new ArrayList<>();
-        int lowestEntropy = 10;
+        int lowestEntropy = Tiles.values().length;
         for (int y = 0; y < 50; y++){
             for(int x=0; x < 50; x ++){
                 int tileEntropy = tileMatrix[y][x].entropy;
