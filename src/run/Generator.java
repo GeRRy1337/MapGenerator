@@ -52,16 +52,22 @@ public class Generator {
         int rand = (int) Math.round(Math.random()*(lowestEntropies.size()-1));
         int[] coords = lowestEntropies.get(rand);
         
-        rand = (int) Math.round(Math.random()*(tileMatrix[coords[1]][coords[0]].goodTiles.size()-1));
+        int sumWeight = tileMatrix[coords[1]][coords[0]].goodTiles.stream().map(element -> element.weight).reduce(0, (acc, e) -> acc + e);
+        rand = (int) Math.round(Math.random()*sumWeight);
+        int idx = 0;
+        while(rand - tileMatrix[coords[1]][coords[0]].goodTiles.get(idx).weight > 0){
+            rand -= tileMatrix[coords[1]][coords[0]].goodTiles.get(idx).weight;
+            idx++;
+        }
         
-        tileMatrix[coords[1]][coords[0]].tile = tileMatrix[coords[1]][coords[0]].goodTiles.get(rand);
+        tileMatrix[coords[1]][coords[0]].tile = tileMatrix[coords[1]][coords[0]].goodTiles.get(idx);
         
         Stack<int[]> stack = new Stack<>();
         stack.push(coords);
         changed.add(coords);
+        updateEntropy(coords[0],coords[1]);
         while(!stack.isEmpty()){
             int[] pair = stack.pop();
-            updateEntropy(pair[0],pair[1]);
             
             boolean updated;
             //top
