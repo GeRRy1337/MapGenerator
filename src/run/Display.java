@@ -6,6 +6,7 @@ import javax.swing.SwingWorker;
 import static run.Generator.changed;
 import static run.Generator.tileMatrix;
 import tileset.Images;
+import tileset.RuleSet;
 import tileset.Tile;
 
 public class Display extends javax.swing.JFrame {
@@ -27,24 +28,208 @@ public class Display extends javax.swing.JFrame {
     private void initComponents() {
 
         mainDisplay = new javax.swing.JPanel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jLabel1 = new javax.swing.JLabel();
+        landmassSpinner = new javax.swing.JSpinner();
+        jLabel2 = new javax.swing.JLabel();
+        waterSpinner = new javax.swing.JSpinner();
+        jLabel3 = new javax.swing.JLabel();
+        edgeSpinner = new javax.swing.JSpinner();
+        jSpinner4 = new javax.swing.JSpinner();
+        jLabel4 = new javax.swing.JLabel();
+        crossSpinner = new javax.swing.JSpinner();
+        jLabel5 = new javax.swing.JLabel();
+        roundedSpinner = new javax.swing.JSpinner();
+        jLabel6 = new javax.swing.JLabel();
+        generateButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        mainDisplay.setLayout(new java.awt.GridLayout());
+        mainDisplay.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel1.setText("Landmass size:");
+
+        landmassSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                landmassSpinnerStateChanged(evt);
+            }
+        });
+
+        jLabel2.setText("Water body size");
+
+        waterSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                waterSpinnerStateChanged(evt);
+            }
+        });
+
+        jLabel3.setText("Edge size:");
+
+        edgeSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                edgeSpinnerStateChanged(evt);
+            }
+        });
+
+        jLabel4.setText("Cross sections:");
+
+        crossSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                crossSpinnerStateChanged(evt);
+            }
+        });
+
+        jLabel5.setText("Edge roundness:");
+
+        roundedSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                roundedSpinnerStateChanged(evt);
+            }
+        });
+
+        jLabel6.setText("Landmass size:");
+
+        generateButton.setText("Generate");
+        generateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                generateButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(mainDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(landmassSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(edgeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(waterSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(22, 22, 22)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(crossSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(roundedSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(86, 86, 86)
+                        .addComponent(generateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(mainDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(landmassSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(waterSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel4)
+                            .addComponent(crossSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5)
+                            .addComponent(roundedSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(generateButton))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(edgeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void landmassSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_landmassSpinnerStateChanged
+        RuleSet.landmass = (int) landmassSpinner.getValue();
+    }//GEN-LAST:event_landmassSpinnerStateChanged
+
+    private void waterSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_waterSpinnerStateChanged
+        RuleSet.water = (int) waterSpinner.getValue();
+    }//GEN-LAST:event_waterSpinnerStateChanged
+
+    private void edgeSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_edgeSpinnerStateChanged
+        RuleSet.edge = (int) edgeSpinner.getValue();
+    }//GEN-LAST:event_edgeSpinnerStateChanged
+
+    private void crossSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_crossSpinnerStateChanged
+        RuleSet.cross = (int) crossSpinner.getValue();
+    }//GEN-LAST:event_crossSpinnerStateChanged
+
+    private void roundedSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_roundedSpinnerStateChanged
+        RuleSet.round = (int) roundedSpinner.getValue();
+    }//GEN-LAST:event_roundedSpinnerStateChanged
+
+    private void generateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateButtonActionPerformed
+        for (int i = 0; i < 50; i++) {
+            for (int j = 0; j < 50; j++) {
+                tileMatrix[i][j] = new Tile();
+                ((JLabel)mainDisplay.getComponent(i*50+j)).setIcon(null);
+                ((JLabel)mainDisplay.getComponent(i*50+j)).setText(tileMatrix[i][j].entropy + "");
+            }
+        }
+
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
+            @Override
+            protected Void doInBackground() throws Exception {
+
+                while (Generator.waveFunctionCollapse()) {
+                    try {
+                        while (!changed.isEmpty()) {
+                            int[] coords = changed.pop();
+                            JLabel label = ((JLabel) mainDisplay.getComponent(coords[1] * 50 + coords[0]));
+                            if (tileMatrix[coords[1]][coords[0]].tile == null) {
+                                label.setText(tileMatrix[coords[1]][coords[0]].entropy + "");
+                            } else {
+                                label.setText("");
+                                label.setIcon(Images.getImage(tileMatrix[coords[1]][coords[0]].tile));
+                            }
+
+                        }
+
+                        Thread.sleep(1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+
+        };
+
+        worker.execute();
+    }//GEN-LAST:event_generateButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -77,7 +262,8 @@ public class Display extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 Display d = new Display();
-                d.setSize(50 * 17, 50 * 17);
+                //d.setSize(50 * 17, 50 * 17);
+                d.mainDisplay.setSize(50 * 17, 50 * 17);
                 d.setVisible(true);
                 GridLayout experimentLayout = new GridLayout(0, 50);
                 experimentLayout.setHgap(0);
@@ -94,42 +280,25 @@ public class Display extends javax.swing.JFrame {
                     }
                 }
 
-                SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-
-                    @Override
-                    protected Void doInBackground() throws Exception {
-
-                        while (Generator.waveFunctionCollapse()) {
-                            try {
-                                while (!changed.isEmpty()) {
-                                    int[] coords = changed.pop();
-                                    JLabel label = ((JLabel) d.mainDisplay.getComponent(coords[1] * 50 + coords[0])); 
-                                    if (tileMatrix[coords[1]][coords[0]].tile == null) {
-                                         label.setText(tileMatrix[coords[1]][coords[0]].entropy + "");
-                                    } else {
-                                        label.setText("");
-                                        label.setIcon(Images.getImage(tileMatrix[coords[1]][coords[0]].tile));
-                                    }
-                                    
-                                }
-                                
-                                Thread.sleep(1);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        return null;
-                    }
-
-
-                };
-
-                worker.execute();
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JSpinner crossSpinner;
+    private javax.swing.JSpinner edgeSpinner;
+    private javax.swing.JButton generateButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSpinner jSpinner4;
+    private javax.swing.JSpinner landmassSpinner;
     private javax.swing.JPanel mainDisplay;
+    private javax.swing.JSpinner roundedSpinner;
+    private javax.swing.JSpinner waterSpinner;
     // End of variables declaration//GEN-END:variables
 }

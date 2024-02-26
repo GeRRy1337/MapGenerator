@@ -3,12 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Dokumentumok/NetBeansProjects/MapGenerator/src/run/Generator.java</file>
-            <file>file:/D:/Dokumentumok/NetBeansProjects/MapGenerator/src/run/Display.java</file>
-            <file>file:/D:/Dokumentumok/NetBeansProjects/MapGenerator/src/tileset/Tile.java</file>
-            <file>file:/D:/Dokumentumok/NetBeansProjects/MapGenerator/src/tileset/Images.java</file>
-            <file>file:/D:/Dokumentumok/NetBeansProjects/MapGenerator/src/tileset/TileType.java</file>
-            <file>file:/D:/Dokumentumok/NetBeansProjects/MapGenerator/src/tileset/Tiles.java</file>
+            <file>file:/home/gerry/NetBeansProjects/MapGenerator/src/tileset/Tiles.java</file>
+            <file>file:/home/gerry/NetBeansProjects/MapGenerator/src/tileset/Images.java</file>
+            <file>file:/home/gerry/NetBeansProjects/MapGenerator/src/run/Display.java</file>
+            <file>file:/home/gerry/NetBeansProjects/MapGenerator/src/tileset/RuleSet.java</file>
+            <file>file:/home/gerry/NetBeansProjects/MapGenerator/src/tileset/Tile.java</file>
+            <file>file:/home/gerry/NetBeansProjects/MapGenerator/src/run/Generator.java</file>
+            <file>file:/home/gerry/NetBeansProjects/MapGenerator/src/tileset/TileType.java</file>
         </group>
     </open-files>
 </project-private>

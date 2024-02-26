@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
+import static run.Generator.tileMatrix;
+import tileset.RuleSet;
 import tileset.Tile;
 import tileset.TileType;
 import tileset.Tiles;
@@ -60,12 +62,12 @@ public class Generator {
 
         int sumWeight = 0;
         for (Tiles t : currGoods) {
-            sumWeight += t.weight;
+            sumWeight += RuleSet.getModifier(t);
         }
 
         rand =  random.nextInt(sumWeight);
         int idx = 0;
-        while ((rand -= currGoods.get(idx).weight) > 0) {
+        while ((rand -= RuleSet.getModifier(currGoods.get(idx))) > 0) {
             idx++;
         }
 
@@ -160,7 +162,7 @@ public class Generator {
         return false;
     }
 
-    private static boolean inBounds(int i, int j) {
+    static boolean inBounds(int i, int j) {
         return i >= 0 && i < 50 && j >= 0 && j < 50;
     }
 
@@ -172,12 +174,67 @@ public class Generator {
      * @return an ArrayList of the possible tiles for the coordinates
      */
     private static ArrayList<Tiles> getGoodTiles(int i, int j) {
+        HashSet<Tiles> topTiles = sideGoodTiles(i,j,"top");
+        HashSet<Tiles> bottomTiles = sideGoodTiles(i,j,"bottom");
+        HashSet<Tiles> leftTiles = sideGoodTiles(i,j,"left");
+        HashSet<Tiles> rightTiles = sideGoodTiles(i,j,"right");
+        
+        ArrayList<Tiles> goodTiles = new ArrayList<>(values);
+        if (!topTiles.isEmpty()) {
+            goodTiles.retainAll(topTiles);
+        }
+        if (!bottomTiles.isEmpty()) {
+            goodTiles.retainAll(bottomTiles);
+        }
+        if (!leftTiles.isEmpty()) {
+            goodTiles.retainAll(leftTiles);
+        }
+        if (!rightTiles.isEmpty()) {
+            goodTiles.retainAll(rightTiles);
+        }
+        return goodTiles;
+    }
+    
+    private static HashSet<Tiles> sideGoodTiles(int x, int y, String side){
+        HashSet<Tiles> goodTiles = new HashSet<>();
+        String opposite = switch(side){
+            case "top" -> "bottom";
+            case "bottom" -> "top";
+            case "left" -> "right";
+            case "right" -> "left";
+            default -> throw new IllegalArgumentException("Unknown side");
+        };
+        if(side.equals( "top")){
+            y -= 1;
+        } else if(side.equals( "bottom")){
+            y += 1;
+        } else if(side.equals( "left")){
+            x -= 1;
+        } else if(side.equals( "right")){
+            x += 1;
+        }
+        
+        if (Generator.inBounds(x, y)) {
+            if (tileMatrix[y][x].tile == null) {
+                for (Tiles tiles : tileMatrix[y][x].goodTiles) {
+                    goodTiles.addAll(Generator.searchConnecting(side, tiles.getSide(opposite)));
+                }
+            } else {
+                goodTiles.addAll(Generator.searchConnecting(side, tileMatrix[y][x].tile.getSide(opposite)));
+            }
+        }
+        
+        return goodTiles;
+    }
+    
+    /*
+    private static ArrayList<Tiles> getGoodTiles(int i, int j) {
 
         HashSet<Tiles> topTiles = new HashSet<>();
         HashSet<Tiles> bottomTiles = new HashSet<>();
         HashSet<Tiles> leftTiles = new HashSet<>();
         HashSet<Tiles> rightTiles = new HashSet<>();
-
+        
         int x = i;
         int y = j - 1;
         //top
@@ -244,8 +301,9 @@ public class Generator {
         }
         return goodTiles;
     }
+    */
 
-    private static ArrayList<Tiles> searchConnecting(String side, TileType tt) {
+    static ArrayList<Tiles> searchConnecting(String side, TileType tt) {
         ArrayList<Tiles> connecting = new ArrayList<>();
 
         for (Tiles currTile : values) {
