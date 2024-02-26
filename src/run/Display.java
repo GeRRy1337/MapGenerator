@@ -1,7 +1,6 @@
 package run;
 
 import java.awt.GridLayout;
-import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 import static run.Generator.changed;
@@ -89,7 +88,7 @@ public class Display extends javax.swing.JFrame {
                     for (int j = 0; j < 50; j++) {
                         tileMatrix[i][j] = new Tile();
                         JLabel thumb = new JLabel();
-                        //thumb.setIcon(Images.getImage(Tiles.WATER));
+
                         thumb.setText(tileMatrix[i][j].entropy + "");
                         d.mainDisplay.add(thumb);
                     }
@@ -102,15 +101,18 @@ public class Display extends javax.swing.JFrame {
 
                         while (Generator.waveFunctionCollapse()) {
                             try {
-                                for (int[] coords : changed) {
+                                while (!changed.isEmpty()) {
+                                    int[] coords = changed.pop();
+                                    JLabel label = ((JLabel) d.mainDisplay.getComponent(coords[1] * 50 + coords[0])); 
                                     if (tileMatrix[coords[1]][coords[0]].tile == null) {
-                                        ((JLabel) d.mainDisplay.getComponent(coords[1] * 50 + coords[0])).setText(tileMatrix[coords[1]][coords[0]].entropy + "");
+                                         label.setText(tileMatrix[coords[1]][coords[0]].entropy + "");
                                     } else {
-                                        ((JLabel) d.mainDisplay.getComponent(coords[1] * 50 + coords[0])).setText("");
-                                        ((JLabel) d.mainDisplay.getComponent(coords[1] * 50 + coords[0])).setIcon(Images.getImage(tileMatrix[coords[1]][coords[0]].tile));
+                                        label.setText("");
+                                        label.setIcon(Images.getImage(tileMatrix[coords[1]][coords[0]].tile));
                                     }
+                                    
                                 }
-                                changed.clear();
+                                
                                 Thread.sleep(1);
                             } catch (Exception e) {
                                 e.printStackTrace();

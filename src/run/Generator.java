@@ -3,24 +3,26 @@ package run;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 import tileset.Tile;
 import tileset.TileType;
 import tileset.Tiles;
 
-
 public class Generator {
 
     static Tile[][] tileMatrix = new Tile[50][50];
-    static ArrayList<int[]> changed = new ArrayList<>();
+    static Stack<int[]> changed = new Stack<>();
+    static final ArrayList<Tiles> values = new ArrayList<>(List.of(Tiles.values()));
+
     public static void main(String[] args) {
         for (int i = 0; i < 50; i++) {
             for (int j = 0; j < 50; j++) {
                 tileMatrix[i][j] = new Tile();
             }
         }
-        
-        while(waveFunctionCollapse());
+
+        while (waveFunctionCollapse());
         printEntropy();
     }
 
@@ -32,7 +34,7 @@ public class Generator {
             System.out.println("");
         }
     }
-    
+
     public static void printEntropy() {
         for (Tile[] row : tileMatrix) {
             for (Tile i : row) {
@@ -41,102 +43,115 @@ public class Generator {
             System.out.println("");
         }
     }
-    
+
     public static boolean waveFunctionCollapse() {
         ArrayList<int[]> lowestEntropies = getLowestEntropies();
-        
-        if(lowestEntropies.isEmpty()){
+        if (lowestEntropies.isEmpty()) {
             return false;
         }
+        Random random = new Random();
         
-        int rand = (int) Math.round(Math.random()*(lowestEntropies.size()-1));
+        int rand = random.nextInt(lowestEntropies.size());
         int[] coords = lowestEntropies.get(rand);
-        
-        int sumWeight = tileMatrix[coords[1]][coords[0]].goodTiles.stream().map(element -> element.weight).reduce(0, (acc, e) -> acc + e);
-        rand = (int) Math.round(Math.random()*sumWeight);
+
+        //int sumWeight = tileMatrix[coords[1]][coords[0]].goodTiles.stream().map(element -> element.weight).reduce(0, (acc, e) -> acc + e);
+        Tile currTile = tileMatrix[coords[1]][coords[0]];
+        ArrayList<Tiles> currGoods = currTile.goodTiles;
+
+        int sumWeight = 0;
+        for (Tiles t : currGoods) {
+            sumWeight += t.weight;
+        }
+
+        rand =  random.nextInt(sumWeight);
         int idx = 0;
-        while(rand - tileMatrix[coords[1]][coords[0]].goodTiles.get(idx).weight > 0){
-            rand -= tileMatrix[coords[1]][coords[0]].goodTiles.get(idx).weight;
+        while ((rand -= currGoods.get(idx).weight) > 0) {
             idx++;
         }
-        
-        tileMatrix[coords[1]][coords[0]].tile = tileMatrix[coords[1]][coords[0]].goodTiles.get(idx);
-        
+
+        currTile.tile = currGoods.get(idx);
+
         Stack<int[]> stack = new Stack<>();
         stack.push(coords);
         changed.add(coords);
-        updateEntropy(coords[0],coords[1]);
-        while(!stack.isEmpty()){
+        updateEntropy(coords[0], coords[1]);
+        while (!stack.isEmpty()) {
             int[] pair = stack.pop();
-            
+
             boolean updated;
             //top
-            updated = updateEntropy(pair[0],pair[1]-1);
-            if(updated){
-                stack.add(new int[]{pair[0],pair[1]-1});
-                changed.add(new int[]{pair[0],pair[1]-1});
+            int[] currNeighbour = new int[]{pair[0], pair[1] - 1};
+            updated = updateEntropy(currNeighbour[0], currNeighbour[1]);
+            if (updated) {
+                stack.add(currNeighbour);
+                changed.add(currNeighbour);
             }
             //bottom
-            updated = updateEntropy(pair[0],pair[1]+1);
-            if(updated){
-                stack.add(new int[]{pair[0],pair[1]+1});
-                changed.add(new int[]{pair[0],pair[1]+1});
+            currNeighbour = new int[]{pair[0], pair[1] + 1};
+            updated = updateEntropy(currNeighbour[0], currNeighbour[1]);
+            if (updated) {
+                stack.add(currNeighbour);
+                changed.add(currNeighbour);
             }
-            
+
             //left
-            updated = updateEntropy(pair[0]-1,pair[1]);
-            if(updated){
-                stack.add(new int[]{pair[0]-1,pair[1]});
-                changed.add(new int[]{pair[0]-1,pair[1]});
+            currNeighbour = new int[]{pair[0] - 1, pair[1]};
+            updated = updateEntropy(currNeighbour[0], currNeighbour[1]);
+            if (updated) {
+                stack.add(currNeighbour);
+                changed.add(currNeighbour);
             }
-            
+
             //right
-            updated = updateEntropy(pair[0]+1,pair[1]);
-            if(updated){
-                stack.add(new int[]{pair[0]+1,pair[1]});
-                changed.add(new int[]{pair[0]+1,pair[1]});
+            currNeighbour = new int[]{pair[0] + 1, pair[1]};
+            updated = updateEntropy(currNeighbour[0], currNeighbour[1]);
+            if (updated) {
+                stack.add(currNeighbour);
+                changed.add(currNeighbour);
             }
         }
-        
+
         return true;
     }
 
-    private static ArrayList<int[]> getLowestEntropies(){
+    private static ArrayList<int[]> getLowestEntropies() {
         ArrayList<int[]> list = new ArrayList<>();
-        int lowestEntropy = Tiles.values().length;
-        for (int y = 0; y < 50; y++){
-            for(int x=0; x < 50; x ++){
+        int lowestEntropy = values.size();
+        for (int y = 0; y < 50; y++) {
+            for (int x = 0; x < 50; x++) {
                 int tileEntropy = tileMatrix[y][x].entropy;
-                if(tileEntropy > 0){
-                    if (tileEntropy < lowestEntropy){
+                if (tileEntropy > 0) {
+                    if (tileEntropy < lowestEntropy) {
                         list.clear();
                         lowestEntropy = tileEntropy;
                     }
-                    if(tileEntropy == lowestEntropy){
-                        list.add(new int[]{x,y});
+                    if (tileEntropy == lowestEntropy) {
+                        list.add(new int[]{x, y});
                     }
                 }
             }
         }
-        
+
         return list;
     }
-    
+
     private static boolean updateEntropy(int x, int y) {
-        if(!inBounds(x,y)) {return false;}
-        if(tileMatrix[y][x].tile != null) {
-            if(tileMatrix[y][x].entropy != 0){
+        if (!inBounds(x, y)) {
+            return false;
+        }
+        if (tileMatrix[y][x].tile != null) {
+            if (tileMatrix[y][x].entropy != 0) {
                 tileMatrix[y][x].entropy = 0;
                 tileMatrix[y][x].goodTiles.clear();
                 return true;
             }
-        }else{
-            ArrayList<Tiles> newGoodTiles = getGoodTiles(x,y);
+        } else {
+            ArrayList<Tiles> newGoodTiles = getGoodTiles(x, y);
             int newEntropy = newGoodTiles.size();
-            if(newEntropy == 0){
+            if (newEntropy == 0) {
                 return false;
             }
-            if (inBounds(x,y) && tileMatrix[y][x].entropy != newEntropy){
+            if (tileMatrix[y][x].entropy != newEntropy) {
                 tileMatrix[y][x].entropy = newEntropy;
                 tileMatrix[y][x].goodTiles = newGoodTiles;
                 return true;
@@ -148,96 +163,101 @@ public class Generator {
     private static boolean inBounds(int i, int j) {
         return i >= 0 && i < 50 && j >= 0 && j < 50;
     }
-    
+
     /**
-     * 
+     * Returns the possible tiles for the coordinates
+     *
      * @param i x coordinate of the tile
      * @param j y coordinate of the tile
      * @return an ArrayList of the possible tiles for the coordinates
      */
-    private static ArrayList<Tiles> getGoodTiles(int i, int j){
-        
-        HashSet<Tiles> topTiles = new HashSet<>(); 
-        HashSet<Tiles> bottomTiles = new HashSet<>(); 
-        HashSet<Tiles> leftTiles = new HashSet<>(); 
-        HashSet<Tiles> rightTiles = new HashSet<>(); 
-        boolean top=false;
-        boolean bottom=false;
-        boolean left=false;
-        boolean right=false;
-        
+    private static ArrayList<Tiles> getGoodTiles(int i, int j) {
+
+        HashSet<Tiles> topTiles = new HashSet<>();
+        HashSet<Tiles> bottomTiles = new HashSet<>();
+        HashSet<Tiles> leftTiles = new HashSet<>();
+        HashSet<Tiles> rightTiles = new HashSet<>();
+
         int x = i;
-        int y = j-1;
+        int y = j - 1;
         //top
-        if(inBounds(x,y)){
-            if(tileMatrix[y][x].tile == null){
-                for(Tiles tiles: tileMatrix[y][x].goodTiles){
+        if (inBounds(x, y)) {
+            if (tileMatrix[y][x].tile == null) {
+                for (Tiles tiles : tileMatrix[y][x].goodTiles) {
                     topTiles.addAll(searchConnecting("top", tiles.bottom));
                 }
-            }else{
-                topTiles.clear();
-                topTiles.addAll(searchConnecting("top",tileMatrix[y][x].tile.bottom));
+            } else {
+                topTiles.addAll(searchConnecting("top", tileMatrix[y][x].tile.bottom));
             }
-            top=true;
         }
-        
+
         //bottom
-        y = j+1;
-        if(inBounds(x,y)){
-            if(tileMatrix[y][x].tile == null){
-                for(Tiles tiles: tileMatrix[y][x].goodTiles){
+        y = j + 1;
+        if (inBounds(x, y)) {
+            if (tileMatrix[y][x].tile == null) {
+                for (Tiles tiles : tileMatrix[y][x].goodTiles) {
                     bottomTiles.addAll(searchConnecting("bottom", tiles.top));
                 }
-            }else{
-                bottomTiles.clear();
-                bottomTiles.addAll(searchConnecting("bottom",tileMatrix[y][x].tile.top));
+            } else {
+                bottomTiles.addAll(searchConnecting("bottom", tileMatrix[y][x].tile.top));
             }
-            bottom=true;
         }
-        
+
         //left
         y = j;
-        x = i-1;
-        if(inBounds(x,y)){
-            if(tileMatrix[y][x].tile == null){
-                for(Tiles tiles: tileMatrix[y][x].goodTiles){
+        x = i - 1;
+        if (inBounds(x, y)) {
+            if (tileMatrix[y][x].tile == null) {
+                for (Tiles tiles : tileMatrix[y][x].goodTiles) {
                     leftTiles.addAll(searchConnecting("left", tiles.right));
                 }
-            }else{
-                leftTiles.clear();
-                leftTiles.addAll(searchConnecting("left",tileMatrix[y][x].tile.right));
+            } else {
+                leftTiles.addAll(searchConnecting("left", tileMatrix[y][x].tile.right));
             }
-            left=true;
         }
-        
-        //right
-        x = i+1;
 
-        if(inBounds(x,y)){
-            if(tileMatrix[y][x].tile == null){
-                for(Tiles tiles: tileMatrix[y][x].goodTiles){
+        //right
+        x = i + 1;
+
+        if (inBounds(x, y)) {
+            if (tileMatrix[y][x].tile == null) {
+                for (Tiles tiles : tileMatrix[y][x].goodTiles) {
                     rightTiles.addAll(searchConnecting("right", tiles.left));
                 }
-            }else{
-                rightTiles.clear();
-                rightTiles.addAll(searchConnecting("right",tileMatrix[y][x].tile.left));
+            } else {
+                rightTiles.addAll(searchConnecting("right", tileMatrix[y][x].tile.left));
             }
-            right=true;
         }
-        
-        ArrayList<Tiles> goodTiles = new ArrayList<>(List.of(Tiles.values())); 
-        if(top)
+
+        ArrayList<Tiles> goodTiles = new ArrayList<>(values);
+        if (!topTiles.isEmpty()) {
             goodTiles.retainAll(topTiles);
-        if(bottom)
+        }
+        if (!bottomTiles.isEmpty()) {
             goodTiles.retainAll(bottomTiles);
-        if(left)
+        }
+        if (!leftTiles.isEmpty()) {
             goodTiles.retainAll(leftTiles);
-        if(right)
+        }
+        if (!rightTiles.isEmpty()) {
             goodTiles.retainAll(rightTiles);
+        }
         return goodTiles;
     }
-    
+
     private static ArrayList<Tiles> searchConnecting(String side, TileType tt) {
-        return new ArrayList<> (List.of(Tiles.values()).stream().filter(tile -> tile.getSide(side).equals(tt)).toList());
+        ArrayList<Tiles> connecting = new ArrayList<>();
+
+        for (Tiles currTile : values) {
+            if (currTile.getSide(side).equals(tt)) {
+                connecting.add(currTile);
+            }
+        }
+
+        return connecting;
     }
+    /*
+    private static ArrayList<Tiles> searchConnecting(String side, TileType tt) {
+        return new ArrayList<>(values.stream().filter(tile -> tile.getSide(side).equals(tt)).toList());
+    }*/
 }
